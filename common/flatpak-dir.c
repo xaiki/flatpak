@@ -1931,9 +1931,9 @@ out:
 
 gboolean
 flatpak_dir_run_triggers (FlatpakDir   *self,
+                          gboolean	errors_are_fatal,
                           GCancellable *cancellable,
-                          GError      **error,
-                          gboolean	errors_are_fatal)
+                          GError      **error)
 {
   gboolean ret = FALSE;
 
@@ -2556,7 +2556,7 @@ flatpak_dir_update_exports (FlatpakDir   *self,
   if (!flatpak_remove_dangling_symlinks (exports, cancellable, error))
     goto out;
 
-  if (!flatpak_dir_run_triggers (self, cancellable, error, TRUE))
+  if (!flatpak_dir_run_triggers (self, TRUE, cancellable, error))
     goto out;
 
   ret = TRUE;
