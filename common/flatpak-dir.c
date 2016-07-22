@@ -1978,6 +1978,7 @@ flatpak_dir_run_triggers (FlatpakDir   *self,
              at that exact path. */
           g_autofree char *basedir_orig = g_file_get_path (self->basedir);
           g_autofree char *basedir = canonicalize_file_name (basedir_orig);
+          gint retv;
 
           g_debug ("running trigger %s", name);
 
@@ -2005,13 +2006,16 @@ flatpak_dir_run_triggers (FlatpakDir   *self,
           g_ptr_array_add (argv_array, g_strdup (basedir));
           g_ptr_array_add (argv_array, NULL);
 
-          if (!g_spawn_sync ("/",
-                             (char **) argv_array->pdata,
-                             NULL,
-                             G_SPAWN_SEARCH_PATH,
-                             NULL, NULL,
-                             NULL, NULL,
-                             NULL, &trigger_error))
+          g_spawn_sync ("/",
+                        (char **) argv_array->pdata,
+                        NULL,
+                        G_SPAWN_SEARCH_PATH,
+                        NULL, NULL,
+                        NULL, NULL,
+                        &retv, &trigger_error);
+          g_spawn_check_exit_status (retv, &trigger_error);
+
+          if (trigger_error)
             {
               g_warning ("Error running trigger %s: %s", name, trigger_error->message);
               if (errors_are_fatal)
