@@ -1931,6 +1931,7 @@ out:
 
 gboolean
 flatpak_dir_run_triggers (FlatpakDir   *self,
+                          const gchar  *type,
                           gboolean	errors_are_fatal,
                           GCancellable *cancellable,
                           GError      **error)
@@ -1939,6 +1940,7 @@ flatpak_dir_run_triggers (FlatpakDir   *self,
 
   g_autoptr(GFileEnumerator) dir_enum = NULL;
   g_autoptr(GFileInfo) child_info = NULL;
+  g_autoptr(GFile) basetriggersdir = NULL;
   g_autoptr(GFile) triggersdir = NULL;
   GError *temp_error = NULL;
   const char *triggerspath;
@@ -1947,9 +1949,10 @@ flatpak_dir_run_triggers (FlatpakDir   *self,
   if (triggerspath == NULL)
     triggerspath = FLATPAK_TRIGGERDIR;
 
-  g_debug ("running triggers from %s", triggerspath);
+  basetriggersdir = g_file_new_for_path (triggerspath);
+  triggersdir = g_file_get_child (basetriggersdir, type);
 
-  triggersdir = g_file_new_for_path (triggerspath);
+  g_debug ("running triggers from %s", triggerspath);
 
   dir_enum = g_file_enumerate_children (triggersdir, "standard::type,standard::name",
                                         0, cancellable, error);
@@ -2556,7 +2559,7 @@ flatpak_dir_update_exports (FlatpakDir   *self,
   if (!flatpak_remove_dangling_symlinks (exports, cancellable, error))
     goto out;
 
-  if (!flatpak_dir_run_triggers (self, TRUE, cancellable, error))
+  if (!flatpak_dir_run_triggers (self, "postinstall", TRUE, cancellable, error))
     goto out;
 
   ret = TRUE;

@@ -56,11 +56,11 @@ else
 AM_CPPFLAGS += -DHELPER=\"$(libexecdir)/flatpak-bwrap\"
 endif
 
-triggersdir = $(pkgdatadir)/triggers
-dist_triggers_SCRIPTS = \
-	triggers/gtk-icon-cache.trigger \
-	triggers/mime-database.trigger \
-	triggers/desktop-database.trigger \
+postinstall_triggersdir = $(pkgdatadir)/triggers/postinstall
+dist_postinstall_triggers_SCRIPTS = \
+	triggers/postinstall/gtk-icon-cache.trigger \
+	triggers/postinstall/mime-database.trigger \
+	triggers/postinstall/desktop-database.trigger \
 	$(NULL)
 
 lib_LTLIBRARIES =
